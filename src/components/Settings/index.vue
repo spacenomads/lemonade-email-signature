@@ -3,15 +3,15 @@
     <form class="form">
       <div class="form__row">
         <label for="signatureName" class="form__label">Nombre</label>
-        <input type="text" id="signatureName" name="signatureName" class="form__field" v-model="localUser.name">
+        <input type="text" id="signatureName" name="signatureName" class="form__field" v-model="user.name">
       </div>
       <div class="form__row">
         <label for="signatureRole" class="form__label">Cargo</label>
-        <input type="text" id="signatureRole" name="signatureRole" class="form__field" v-model="localUser.role">
+        <input type="text" id="signatureRole" name="signatureRole" class="form__field" v-model="user.role">
       </div>
       <div class="form__row">
         <label for="signatureURL" class="form__label">url</label>
-        <input type="text" id="signatureURL" name="signatureURL" class="form__field" v-model="localUser.url">
+        <input type="text" id="signatureURL" name="signatureURL" class="form__field" v-model="user.url">
       </div>
 
       <div class="form__row">
@@ -25,7 +25,8 @@
 </template>
 
 <script>
-import { ref, reactive, watch, computed } from 'vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 
 const SIGNATURE_SELECTOR = '.signature';
 const NOTIFICATION_DELAY = 1000;
@@ -34,16 +35,8 @@ const NOTIFICATION_KO = '💩 FORK!';
 
 export default {
   name: 'Settings',
-  props: {
-    user: Object
-  },
-  setup(props, { emit }) {
-    const localUser = reactive({
-      name: props.user.name,
-      role: props.user.role,
-      url: props.user.url
-    });
-
+  setup() {
+    const store = useStore();
     const notification =  ref(false);
     const result = ref(undefined);
 
@@ -66,16 +59,13 @@ export default {
       return notification.value ? 'app__notification--visible' : null;
     });
 
-    watch(localUser, (oldUser, newUser) => {
-      emit('handleUser', newUser);
-    });
 
     return {
-      localUser,
+      user: computed( ()=>store.state.user ),
       selectText,
       result,
       notification,
-      getNotificationStatus
+      getNotificationStatus,
     }
   }
 }
